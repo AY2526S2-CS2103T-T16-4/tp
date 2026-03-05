@@ -31,7 +31,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ### Harikrishnan
 
-<img src="images/harikrishnan.png" width="200px">
+<img src="images/harikrishn4a.png" width="200px">
 
 [[github](https://github.com/harikrishnannandakumar)]
 [[portfolio](team/harikrishnan.md)]
