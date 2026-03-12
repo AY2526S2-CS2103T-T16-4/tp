@@ -92,6 +92,14 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the {@code Stage} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withStage(String stage) {
+        this.stage = seedu.address.model.person.Stage.fromString(stage);
+        return this;
+    }
+
     public Person build() {
         return new Person(name, phone, email, address, stage, tags);
     }
