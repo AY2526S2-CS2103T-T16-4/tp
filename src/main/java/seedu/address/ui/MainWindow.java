@@ -4,11 +4,14 @@ import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
@@ -49,7 +52,7 @@ public class MainWindow extends UiPart<Stage> {
     private StackPane resultDisplayPlaceholder;
 
     @FXML
-    private StackPane viewPanelPlaceholder;
+    private StackPane contentAreaPlaceholder;
 
     @FXML
     private StackPane statusbarPlaceholder;
@@ -121,7 +124,6 @@ public class MainWindow extends UiPart<Stage> {
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
 
         viewPanel = new ViewPanel();
-        viewPanelPlaceholder.getChildren().add(viewPanel.getRoot());
 
         StatusBarFooter statusBarFooter = new StatusBarFooter(logic.getAddressBookFilePath());
         statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
@@ -175,6 +177,31 @@ public class MainWindow extends UiPart<Stage> {
     }
 
     /**
+     * Replaces the content area with a SplitPane showing the person list and the view panel.
+     */
+    private void showViewPanel(seedu.address.model.person.Person person) {
+        viewPanel.setPerson(person);
+
+        if (contentAreaPlaceholder.getChildren().size() == 1
+                && contentAreaPlaceholder.getChildren().get(0) instanceof SplitPane) {
+            return;
+        }
+
+        VBox personListVBox = (VBox) contentAreaPlaceholder.getChildren().remove(0);
+
+        StackPane viewPanelWrapper = new StackPane(viewPanel.getRoot());
+        viewPanelWrapper.getStyleClass().add("pane-with-border");
+        viewPanelWrapper.setPadding(new Insets(5));
+        viewPanelWrapper.setMinWidth(300);
+
+        SplitPane splitPane = new SplitPane(personListVBox, viewPanelWrapper);
+        splitPane.setDividerPositions(0.4);
+        VBox.setVgrow(splitPane, javafx.scene.layout.Priority.ALWAYS);
+
+        contentAreaPlaceholder.getChildren().add(splitPane);
+    }
+
+    /**
      * Executes the command and returns the result.
      *
      * @see seedu.address.logic.Logic#execute(String)
@@ -193,7 +220,7 @@ public class MainWindow extends UiPart<Stage> {
                 handleExit();
             }
 
-            commandResult.getPersonToView().ifPresent(viewPanel::setPerson);
+            commandResult.getPersonToView().ifPresent(this::showViewPanel);
 
             return commandResult;
         } catch (CommandException | ParseException e) {
