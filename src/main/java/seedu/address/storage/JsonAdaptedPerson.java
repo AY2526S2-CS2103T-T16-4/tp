@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Stage;
@@ -26,6 +27,7 @@ class JsonAdaptedPerson {
     private final String name;
     private final String address;
     private final String stage;
+    private final List<String> aliases = new ArrayList<>();
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
 
     /**
@@ -35,10 +37,14 @@ class JsonAdaptedPerson {
     public JsonAdaptedPerson(@JsonProperty("name") String name,
             @JsonProperty("address") String address,
             @JsonProperty("stage") String stage,
+            @JsonProperty("aliases") List<String> aliases,
             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
         this.address = address;
         this.stage = stage;
+        if (aliases != null) {
+            this.aliases.addAll(aliases);
+        }
         if (tags != null) {
             this.tags.addAll(tags);
         }
@@ -51,6 +57,9 @@ class JsonAdaptedPerson {
         name = source.getName().fullName;
         address = source.getAddress().value;
         stage = source.getStage().toString();
+        aliases.addAll(source.getAliases().stream()
+                .map(a -> a.value)
+                .collect(Collectors.toList()));
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
@@ -65,6 +74,14 @@ class JsonAdaptedPerson {
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
             personTags.add(tag.toModelType());
+        }
+
+        final List<Alias> personAliases = new ArrayList<>();
+        for (String alias : aliases) {
+            if (alias == null || !Alias.isValidAlias(alias.trim())) {
+                throw new IllegalValueException(Alias.MESSAGE_CONSTRAINTS);
+            }
+            personAliases.add(new Alias(alias));
         }
 
         if (name == null) {
@@ -94,7 +111,7 @@ class JsonAdaptedPerson {
         }
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelAddress, modelStage, modelTags);
+        return new Person(modelName, modelAddress, modelStage, personAliases, modelTags);
     }
 
 }

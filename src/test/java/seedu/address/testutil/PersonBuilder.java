@@ -1,9 +1,11 @@
 package seedu.address.testutil;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.tag.Tag;
@@ -20,6 +22,7 @@ public class PersonBuilder {
     private Name name;
     private Address address;
     private seedu.address.model.person.Stage stage;
+    private List<Alias> aliases;
     private Set<Tag> tags;
 
     /**
@@ -29,6 +32,7 @@ public class PersonBuilder {
         name = new Name(DEFAULT_NAME);
         address = new Address(DEFAULT_ADDRESS);
         stage = seedu.address.model.person.Stage.SURVEILLANCE;
+        aliases = List.of();
         tags = new HashSet<>();
     }
 
@@ -39,6 +43,7 @@ public class PersonBuilder {
         name = personToCopy.getName();
         address = personToCopy.getAddress();
         stage = personToCopy.getStage();
+        aliases = personToCopy.getAliases();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -74,8 +79,18 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the aliases of the {@code Person} that we are building.
+     */
+    public PersonBuilder withAliases(String... aliases) {
+        this.aliases = java.util.Arrays.stream(aliases)
+                .map(Alias::new)
+                .toList();
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, address, stage, tags);
+        return new Person(name, address, stage, aliases, tags);
     }
 
 }

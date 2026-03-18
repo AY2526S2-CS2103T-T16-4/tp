@@ -2,6 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_ALIAS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_STAGE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
@@ -24,11 +25,13 @@ public class AddCommand extends Command {
             + PREFIX_NAME + "NAME "
             + PREFIX_ADDRESS + "ADDRESS "
             + PREFIX_STAGE + "STAGE "
+            + "[" + PREFIX_ALIAS + "ALIAS(,ALIAS...)] "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_NAME + "John Doe "
             + PREFIX_ADDRESS + "311, Clementi Ave 2, #02-25 "
             + PREFIX_STAGE + "surveillance "
+            + PREFIX_ALIAS + "Ah Boy, Johnny T "
             + PREFIX_TAG + "friends "
             + PREFIX_TAG + "owesMoney";
 

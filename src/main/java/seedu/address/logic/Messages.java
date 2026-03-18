@@ -39,6 +39,8 @@ public class Messages {
         builder.append(person.getName())
                 .append("; Address: ")
                 .append(person.getAddress())
+                .append("; Aliases: ")
+                .append(String.join(", ", person.getAliases().stream().map(a -> a.value).toList()))
                 .append("; Stage: ")
                 .append(person.getStage())
                 .append("; Tags: ");

@@ -4,6 +4,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,16 +23,18 @@ public class Person {
 
     // Data fields
     private final Address address;
+    private final List<Alias> aliases;
     private final Set<Tag> tags = new HashSet<>();
 
     /**
      * Every field must be present and not null.
      */
-    public Person(Name name, Address address, Stage stage, Set<Tag> tags) {
-        requireAllNonNull(name, address, stage, tags);
+    public Person(Name name, Address address, Stage stage, List<Alias> aliases, Set<Tag> tags) {
+        requireAllNonNull(name, address, stage, aliases, tags);
         this.name = name;
         this.address = address;
         this.stage = stage;
+        this.aliases = List.copyOf(aliases);
         this.tags.addAll(tags);
     }
 
@@ -41,6 +44,10 @@ public class Person {
 
     public Address getAddress() {
         return address;
+    }
+
+    public List<Alias> getAliases() {
+        return Collections.unmodifiableList(aliases);
     }
 
     public Stage getStage() {
@@ -87,13 +94,14 @@ public class Person {
         return name.equals(otherPerson.name)
                 && address.equals(otherPerson.address)
                 && stage.equals(otherPerson.stage)
+                && aliases.equals(otherPerson.aliases)
                 && tags.equals(otherPerson.tags);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, address, stage, tags);
+        return Objects.hash(name, address, stage, aliases, tags);
     }
 
     @Override
@@ -101,6 +109,7 @@ public class Person {
         return new ToStringBuilder(this)
                 .add("name", name)
                 .add("address", address)
+                .add("aliases", aliases)
                 .add("stage", stage)
                 .add("tags", tags)
                 .toString();

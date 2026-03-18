@@ -3,6 +3,8 @@ package seedu.address.logic.parser;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +12,7 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Name;
 import seedu.address.model.tag.Tag;
 
@@ -61,6 +64,37 @@ public class ParserUtil {
             throw new ParseException(Address.MESSAGE_CONSTRAINTS);
         }
         return new Address(trimmedAddress);
+    }
+
+    /**
+     * Parses a raw {@code al/} string into a list of {@code Alias}.
+     * Values are comma-separated. Leading/trailing whitespaces around each alias will be trimmed.
+     *
+     * <p>An empty input returns an empty alias list.</p>
+     *
+     * @throws ParseException if any alias token is invalid.
+     */
+    public static List<Alias> parseAliases(String rawAliases) throws ParseException {
+        requireNonNull(rawAliases);
+        String trimmed = rawAliases.trim();
+        if (trimmed.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> tokens = List.of(trimmed.split(","));
+        try {
+            return tokens.stream()
+                    .map(String::trim)
+                    .map(token -> {
+                        if (token.isEmpty() || !Alias.isValidAlias(token)) {
+                            throw new IllegalArgumentException("Invalid alias token");
+                        }
+                        return new Alias(token);
+                    })
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException ex) {
+            throw new ParseException(Alias.MESSAGE_CONSTRAINTS);
+        }
     }
 
     /**
