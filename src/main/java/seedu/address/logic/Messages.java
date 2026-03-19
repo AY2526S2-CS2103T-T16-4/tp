@@ -37,14 +37,18 @@ public class Messages {
     public static String format(Person person) {
         final StringBuilder builder = new StringBuilder();
         builder.append(person.getName())
+                .append("; Phone: ")
+                .append(person.getPhone())
+                .append("; Email: ")
+                .append(person.getEmail())
                 .append("; Address: ")
                 .append(person.getAddress())
+                .append("; Stage: ")
+                .append(person.getStage())
                 .append("; Aliases: ")
                 .append(String.join(", ", person.getAliases().stream().map(a -> a.value).toList()))
                 .append("; Notes: ")
                 .append(person.getNotes())
-                .append("; Stage: ")
-                .append(person.getStage())
                 .append("; Risk: ")
                 .append(person.getRisk())
                 .append("; Tags: ");

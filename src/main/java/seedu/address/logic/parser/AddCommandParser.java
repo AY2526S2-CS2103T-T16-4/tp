@@ -3,8 +3,10 @@ package seedu.address.logic.parser;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ALIAS;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NOTES;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_RISK;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_STAGE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
@@ -17,9 +19,11 @@ import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Alias;
+import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Notes;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Phone;
 import seedu.address.model.person.Risk;
 import seedu.address.model.person.Stage;
 import seedu.address.model.tag.Tag;
@@ -37,17 +41,22 @@ public class AddCommandParser implements Parser<AddCommand> {
     public AddCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap =
                 ArgumentTokenizer.tokenize(args,
-                        PREFIX_NAME, PREFIX_ADDRESS, PREFIX_ALIAS, PREFIX_NOTES, PREFIX_RISK, PREFIX_TAG, PREFIX_STAGE);
+                        PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS,
+                        PREFIX_ALIAS, PREFIX_NOTES, PREFIX_RISK, PREFIX_TAG, PREFIX_STAGE);
 
-        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_ADDRESS, PREFIX_STAGE)
+        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL,
+                PREFIX_ADDRESS, PREFIX_STAGE)
                 || !argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddCommand.MESSAGE_USAGE));
         }
 
-        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_ADDRESS, PREFIX_ALIAS, PREFIX_NOTES, PREFIX_RISK,
-                PREFIX_STAGE);
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS,
+                PREFIX_ALIAS, PREFIX_NOTES, PREFIX_RISK, PREFIX_STAGE);
         Name name = ParserUtil.parseName(argMultimap.getValue(PREFIX_NAME).get());
+        Phone phone = ParserUtil.parsePhone(argMultimap.getValue(PREFIX_PHONE).get());
+        Email email = ParserUtil.parseEmail(argMultimap.getValue(PREFIX_EMAIL).get());
         Address address = ParserUtil.parseAddress(argMultimap.getValue(PREFIX_ADDRESS).get());
+        Stage stage = ParserUtil.parseStage(argMultimap.getValue(PREFIX_STAGE).get());
         List<Alias> aliases = List.of();
         if (argMultimap.getValue(PREFIX_ALIAS).isPresent()) {
             aliases = ParserUtil.parseAliases(argMultimap.getValue(PREFIX_ALIAS).get());
@@ -64,9 +73,8 @@ public class AddCommandParser implements Parser<AddCommand> {
             risk = ParserUtil.parseRisk(argMultimap.getValue(PREFIX_RISK).get());
         }
         Set<Tag> tagList = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
-        Stage stage = parseStage(argMultimap.getValue(PREFIX_STAGE).get());
 
-        Person person = new Person(name, address, stage, aliases, notes, risk, tagList);
+        Person person = new Person(name, phone, email, address, stage, aliases, notes, risk, tagList);
 
         return new AddCommand(person);
     }
@@ -78,17 +86,4 @@ public class AddCommandParser implements Parser<AddCommand> {
     private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
         return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
-
-    /**
-     * Parses a raw stage string into a {@code Stage}, wrapping validation errors
-     * as {@code ParseException}.
-     */
-    private static Stage parseStage(String stage) throws ParseException {
-        try {
-            return Stage.fromString(stage);
-        } catch (IllegalArgumentException ex) {
-            throw new ParseException(Stage.MESSAGE_CONSTRAINTS);
-        }
-    }
-
 }

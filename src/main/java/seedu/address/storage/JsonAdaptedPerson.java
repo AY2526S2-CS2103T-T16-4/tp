@@ -12,9 +12,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Alias;
+import seedu.address.model.person.Email;
+import seedu.address.model.person.Encounter;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Notes;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Phone;
 import seedu.address.model.person.Risk;
 import seedu.address.model.person.Stage;
 import seedu.address.model.tag.Tag;
@@ -27,25 +30,33 @@ class JsonAdaptedPerson {
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Person's %s field is missing!";
 
     private final String name;
+    private final String phone;
+    private final String email;
     private final String address;
     private final String stage;
     private final List<String> aliases = new ArrayList<>();
     private final String notes;
     private final String risk;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
+    private final List<JsonAdaptedEncounter> encounters = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
      */
     @JsonCreator
     public JsonAdaptedPerson(@JsonProperty("name") String name,
+            @JsonProperty("phone") String phone,
+            @JsonProperty("email") String email,
             @JsonProperty("address") String address,
             @JsonProperty("stage") String stage,
             @JsonProperty("aliases") List<String> aliases,
             @JsonProperty("notes") String notes,
             @JsonProperty("risk") String risk,
-            @JsonProperty("tags") List<JsonAdaptedTag> tags) {
+            @JsonProperty("tags") List<JsonAdaptedTag> tags,
+            @JsonProperty("encounters") List<JsonAdaptedEncounter> encounters) {
         this.name = name;
+        this.phone = phone;
+        this.email = email;
         this.address = address;
         this.stage = stage;
         if (aliases != null) {
@@ -56,6 +67,9 @@ class JsonAdaptedPerson {
         if (tags != null) {
             this.tags.addAll(tags);
         }
+        if (encounters != null) {
+            this.encounters.addAll(encounters);
+        }
     }
 
     /**
@@ -63,6 +77,8 @@ class JsonAdaptedPerson {
      */
     public JsonAdaptedPerson(Person source) {
         name = source.getName().fullName;
+        phone = source.getPhone().value;
+        email = source.getEmail().value;
         address = source.getAddress().value;
         stage = source.getStage().toString();
         aliases.addAll(source.getAliases().stream()
@@ -72,6 +88,9 @@ class JsonAdaptedPerson {
         risk = source.getRisk().toString();
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
+                .collect(Collectors.toList()));
+        encounters.addAll(source.getEncounters().stream()
+                .map(JsonAdaptedEncounter::new)
                 .collect(Collectors.toList()));
     }
 
@@ -87,11 +106,20 @@ class JsonAdaptedPerson {
         }
 
         final List<Alias> personAliases = new ArrayList<>();
-        for (String alias : aliases) {
-            if (alias == null || !Alias.isValidAlias(alias.trim())) {
-                throw new IllegalValueException(Alias.MESSAGE_CONSTRAINTS);
+        if (aliases != null) {
+            for (String alias : aliases) {
+                if (alias == null || !Alias.isValidAlias(alias.trim())) {
+                    throw new IllegalValueException(Alias.MESSAGE_CONSTRAINTS);
+                }
+                personAliases.add(new Alias(alias));
             }
-            personAliases.add(new Alias(alias));
+        }
+
+        final List<Encounter> personEncounters = new ArrayList<>();
+        if (encounters != null) {
+            for (JsonAdaptedEncounter encounter : encounters) {
+                personEncounters.add(encounter.toModelType());
+            }
         }
 
         if (name == null) {
@@ -102,8 +130,25 @@ class JsonAdaptedPerson {
         }
         final Name modelName = new Name(name);
 
+        if (phone == null) {
+            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Phone.class.getSimpleName()));
+        }
+        if (!Phone.isValidPhone(phone)) {
+            throw new IllegalValueException(Phone.MESSAGE_CONSTRAINTS);
+        }
+        final Phone modelPhone = new Phone(phone);
+
+        if (email == null) {
+            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Email.class.getSimpleName()));
+        }
+        if (!Email.isValidEmail(email)) {
+            throw new IllegalValueException(Email.MESSAGE_CONSTRAINTS);
+        }
+        final Email modelEmail = new Email(email);
+
         if (address == null) {
-            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Address.class.getSimpleName()));
+            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT,
+                    Address.class.getSimpleName()));
         }
         if (!Address.isValidAddress(address)) {
             throw new IllegalValueException(Address.MESSAGE_CONSTRAINTS);
@@ -142,7 +187,8 @@ class JsonAdaptedPerson {
         }
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelAddress, modelStage, personAliases, modelNotes, modelRisk, modelTags);
+        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelStage,
+                personAliases, modelNotes, modelRisk, modelTags, personEncounters);
     }
 
 }

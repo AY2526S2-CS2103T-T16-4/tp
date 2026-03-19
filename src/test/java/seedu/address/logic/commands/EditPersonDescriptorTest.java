@@ -51,11 +51,15 @@ public class EditPersonDescriptorTest {
     public void toStringMethod() {
         EditPersonDescriptor editPersonDescriptor = new EditPersonDescriptor();
         String expected = EditPersonDescriptor.class.getCanonicalName() + "{name="
-                + editPersonDescriptor.getName().orElse(null) + ", address="
-                + editPersonDescriptor.getAddress().orElse(null) + ", aliases="
+                + editPersonDescriptor.getName().orElse(null) + ", phone="
+                + editPersonDescriptor.getPhone().orElse(null) + ", email="
+                + editPersonDescriptor.getEmail().orElse(null) + ", address="
+                + editPersonDescriptor.getAddress().orElse(null) + ", stage="
+                + editPersonDescriptor.getStage().orElse(null) + ", aliases="
                 + editPersonDescriptor.getAliases().orElse(null) + ", notes="
                 + editPersonDescriptor.getNotes().orElse(null) + ", risk="
-                + editPersonDescriptor.getRisk().orElse(null) + "}";
+                + editPersonDescriptor.getRisk().orElse(null) + ", tags="
+                + editPersonDescriptor.getTags().orElse(null) + "}";
         assertEquals(expected, editPersonDescriptor.toString());
     }
 }
