@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Encounter;
 import seedu.address.model.person.Name;
@@ -27,6 +28,7 @@ class JsonAdaptedPerson {
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Person's %s field is missing!";
 
     private final String name;
+    private final String alias;
     private final String phone;
     private final String email;
     private final String address;
@@ -38,12 +40,15 @@ class JsonAdaptedPerson {
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
      */
     @JsonCreator
-    public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
+        public JsonAdaptedPerson(@JsonProperty("name") String name,
+            @JsonProperty("alias") String alias,
+            @JsonProperty("phone") String phone,
             @JsonProperty("email") String email, @JsonProperty("address") String address,
             @JsonProperty("stage") String stage,
             @JsonProperty("tags") List<JsonAdaptedTag> tags,
             @JsonProperty("encounters") List<JsonAdaptedEncounter> encounters) {
         this.name = name;
+        this.alias = alias;
         this.phone = phone;
         this.email = email;
         this.address = address;
@@ -61,6 +66,7 @@ class JsonAdaptedPerson {
      */
     public JsonAdaptedPerson(Person source) {
         name = source.getName().fullName;
+        alias = source.getAlias().aliasString;
         phone = source.getPhone().value;
         email = source.getEmail().value;
         address = source.getAddress().value;
@@ -97,6 +103,16 @@ class JsonAdaptedPerson {
         }
         final Name modelName = new Name(name);
 
+        final Alias modelAlias;
+        if (alias == null || alias.isEmpty()) {
+            modelAlias = new Alias(name);
+        } else {
+            if (!Alias.isValidAlias(alias)) {
+                throw new IllegalValueException(Alias.MESSAGE_CONSTRAINTS);
+            }
+            modelAlias = new Alias(alias);
+        }
+
         if (phone == null) {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Phone.class.getSimpleName()));
         }
@@ -132,7 +148,8 @@ class JsonAdaptedPerson {
         }
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelStage, modelTags, personEncounters);
+        return new Person(modelName, modelAlias, modelPhone, modelEmail, modelAddress, modelStage,
+                modelTags, personEncounters);
     }
 
 }

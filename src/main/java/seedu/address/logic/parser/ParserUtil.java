@@ -15,10 +15,12 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Encounter;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Stage;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -126,6 +128,33 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a {@code String alias} into an {@code Alias}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given {@code alias} is invalid.
+     */
+    public static Alias parseAlias(String alias) throws ParseException {
+        requireNonNull(alias);
+        String trimmedAlias = alias.trim();
+        if (!Alias.isValidAlias(trimmedAlias)) {
+            throw new ParseException(Alias.MESSAGE_CONSTRAINTS);
+        }
+        return new Alias(trimmedAlias);
+    }
+
+    /**
+     * Parses a raw stage string into a {@code Stage}, wrapping validation errors
+     * as {@code ParseException}.
+     */
+    public static Stage parseStage(String stage) throws ParseException {
+        try {
+            return Stage.fromString(stage);
+        } catch (IllegalArgumentException ex) {
+            throw new ParseException(Stage.MESSAGE_CONSTRAINTS);
+        }
     }
 
     /**

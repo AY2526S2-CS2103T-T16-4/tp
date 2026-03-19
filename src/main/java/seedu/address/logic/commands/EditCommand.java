@@ -22,10 +22,12 @@ import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Address;
+import seedu.address.model.person.Alias;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Stage;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -96,14 +98,15 @@ public class EditCommand extends Command {
         assert personToEdit != null;
 
         Name updatedName = editPersonDescriptor.getName().orElse(personToEdit.getName());
+        Alias updatedAlias = editPersonDescriptor.getAlias().orElse(personToEdit.getAlias());
         Phone updatedPhone = editPersonDescriptor.getPhone().orElse(personToEdit.getPhone());
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
         Address updatedAddress = editPersonDescriptor.getAddress().orElse(personToEdit.getAddress());
+        Stage updatedStage = editPersonDescriptor.getStage().orElse(personToEdit.getStage());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        // Stage is not currently editable; preserve the existing stage.
-        return new Person(updatedName, updatedPhone, updatedEmail,
-                updatedAddress, personToEdit.getStage(), updatedTags);
+        return new Person(updatedName, updatedAlias, updatedPhone, updatedEmail,
+            updatedAddress, updatedStage, updatedTags);
     }
 
     @Override
@@ -136,9 +139,11 @@ public class EditCommand extends Command {
      */
     public static class EditPersonDescriptor {
         private Name name;
+        private Alias alias;
         private Phone phone;
         private Email email;
         private Address address;
+        private Stage stage;
         private Set<Tag> tags;
 
         public EditPersonDescriptor() {}
@@ -149,9 +154,11 @@ public class EditCommand extends Command {
          */
         public EditPersonDescriptor(EditPersonDescriptor toCopy) {
             setName(toCopy.name);
+            setAlias(toCopy.alias);
             setPhone(toCopy.phone);
             setEmail(toCopy.email);
             setAddress(toCopy.address);
+            setStage(toCopy.stage);
             setTags(toCopy.tags);
         }
 
@@ -159,7 +166,7 @@ public class EditCommand extends Command {
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags);
+            return CollectionUtil.isAnyNonNull(name, alias, phone, email, address, stage, tags);
         }
 
         public void setName(Name name) {
@@ -168,6 +175,14 @@ public class EditCommand extends Command {
 
         public Optional<Name> getName() {
             return Optional.ofNullable(name);
+        }
+
+        public void setAlias(Alias alias) {
+            this.alias = alias;
+        }
+
+        public Optional<Alias> getAlias() {
+            return Optional.ofNullable(alias);
         }
 
         public void setPhone(Phone phone) {
@@ -192,6 +207,14 @@ public class EditCommand extends Command {
 
         public Optional<Address> getAddress() {
             return Optional.ofNullable(address);
+        }
+
+        public void setStage(Stage stage) {
+            this.stage = stage;
+        }
+
+        public Optional<Stage> getStage() {
+            return Optional.ofNullable(stage);
         }
 
         /**
@@ -224,9 +247,11 @@ public class EditCommand extends Command {
 
             EditPersonDescriptor otherEditPersonDescriptor = (EditPersonDescriptor) other;
             return Objects.equals(name, otherEditPersonDescriptor.name)
+                    && Objects.equals(alias, otherEditPersonDescriptor.alias)
                     && Objects.equals(phone, otherEditPersonDescriptor.phone)
                     && Objects.equals(email, otherEditPersonDescriptor.email)
                     && Objects.equals(address, otherEditPersonDescriptor.address)
+                    && Objects.equals(stage, otherEditPersonDescriptor.stage)
                     && Objects.equals(tags, otherEditPersonDescriptor.tags);
         }
 
@@ -234,9 +259,11 @@ public class EditCommand extends Command {
         public String toString() {
             return new ToStringBuilder(this)
                     .add("name", name)
+                    .add("alias", alias)
                     .add("phone", phone)
                     .add("email", email)
                     .add("address", address)
+                    .add("stage", stage)
                     .add("tags", tags)
                     .toString();
         }
