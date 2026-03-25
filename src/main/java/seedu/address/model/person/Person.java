@@ -1,6 +1,5 @@
 package seedu.address.model.person;
 
-import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.ArrayList;
@@ -15,7 +14,8 @@ import seedu.address.model.tag.Tag;
 
 /**
  * Represents a Person in CrimeWatch.
- * Guarantees: details are present and not null, field values are validated, immutable.
+ * Guarantees: details are present and not null, field values are validated,
+ * immutable.
  */
 public class Person {
 
@@ -32,15 +32,15 @@ public class Person {
     private final Risk risk;
     private final Set<Tag> tags = new HashSet<>();
     private final List<Encounter> encounters = new ArrayList<>();
-    private final Password password = new Password();
+    private final Password password;
 
     /**
      * Full constructor - every field must be present and not null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Stage stage,
-                  List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags, List<Encounter> encounters,
-                  Password password) {
-        requireAllNonNull(name, phone, email, address, stage, aliases, notes, risk, tags, encounters, password);
+            List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags, List<Encounter> encounters,
+            Password password) {
+        requireAllNonNull(name, phone, email, address, stage, aliases, notes, risk, tags, encounters);
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -54,24 +54,25 @@ public class Person {
         this.password = password;
     }
 
-    /** 
+    /**
      * Convenience constructor without password.
      */
     public Person(Name name, Phone phone, Email email, Address address, Stage stage,
-                  List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags, List<Encounter> encounters) {
-        this(name, phone, email, address, stage, aliases, notes, risk, tags, encounters, new Password());
+            List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags, List<Encounter> encounters) {
+        this(name, phone, email, address, stage, aliases, notes, risk, tags, encounters, null);
     }
 
     /**
      * Convenience constructor without encounters.
      */
     public Person(Name name, Phone phone, Email email, Address address, Stage stage,
-                  List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags) {
+            List<Alias> aliases, Notes notes, Risk risk, Set<Tag> tags) {
         this(name, phone, email, address, stage, aliases, notes, risk, tags, Collections.emptyList());
     }
 
     /**
-     * Convenience constructor with default notes, risk, empty aliases, and no encounters.
+     * Convenience constructor with default notes, risk, empty aliases, and no
+     * encounters.
      */
     public Person(Name name, Phone phone, Email email, Address address, Stage stage, Set<Tag> tags) {
         this(name, phone, email, address, stage, List.of(), new Notes(""), Risk.getDefault(), tags,
@@ -121,7 +122,8 @@ public class Person {
     }
 
     /**
-     * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
+     * Returns an immutable tag set, which throws
+     * {@code UnsupportedOperationException}
      * if modification is attempted.
      */
     public Set<Tag> getTags() {
@@ -129,18 +131,33 @@ public class Person {
     }
 
     /**
-     * Returns an immutable encounter list, which throws {@code UnsupportedOperationException}
+     * Returns an immutable encounter list, which throws
+     * {@code UnsupportedOperationException}
      * if modification is attempted.
      */
     public List<Encounter> getEncounters() {
         return Collections.unmodifiableList(encounters);
     }
 
-    /** 
+    /**
      * Returns the password of the person.
      */
     public Password getPassword() {
         return password;
+    }
+
+    /**
+     * Returns true if this person has a password configured.
+     */
+    public boolean hasPassword() {
+        return password != null;
+    }
+
+    /**
+     * Returns true if the given raw password matches this person's configured password.
+     */
+    public boolean isPasswordMatch(String rawPassword) {
+        return hasPassword() && password.password.equals(rawPassword);
     }
 
     /**
@@ -181,12 +198,13 @@ public class Person {
                 && notes.equals(otherPerson.notes)
                 && risk.equals(otherPerson.risk)
                 && tags.equals(otherPerson.tags)
-                && encounters.equals(otherPerson.encounters);
+                && encounters.equals(otherPerson.encounters)
+                && Objects.equals(password, otherPerson.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, phone, email, address, stage, aliases, notes, risk, tags, encounters);
+        return Objects.hash(name, phone, email, address, stage, aliases, notes, risk, tags, encounters, password);
     }
 
     @Override
