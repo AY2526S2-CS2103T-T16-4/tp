@@ -166,7 +166,7 @@ Format: `export l/LOCATION`
 * Location matching is case-insensitive.
 * Leading/trailing whitespace in `LOCATION` is ignored.
 * The CSV is written to the `exports/` folder in your app home directory, as `CrimeWatch-export-<timestamp>.csv`.
-* If no encounters match, the command fails with `No encounters found at location LOCATION.` and no CSV file is created.
+* If no encounters match, the command fails with a message like `No encounters found at location Maxwell Road.` (using your given location) and no CSV file is created.
 
 Example:
 * `export l/Harbor District`
