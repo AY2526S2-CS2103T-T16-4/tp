@@ -67,7 +67,7 @@ public class ExportCommand extends Command {
 
             int matchedCount = 0;
             try (BufferedWriter writer = Files.newBufferedWriter(exportFile, StandardCharsets.UTF_8)) {
-                writer.write("contactName,contactTags");
+                writer.write("contactName,contactTags,encounter");
                 writer.newLine();
 
                 for (Person person : people) {
@@ -77,11 +77,11 @@ public class ExportCommand extends Command {
                             .map(tag -> tag.tagName)
                             .collect(Collectors.joining(","));
 
-                    String row = csvField(contactName) + "," + csvField(contactTags);
+                    String contactPrefix = csvField(contactName) + "," + csvField(contactTags) + ",";
 
                     for (Encounter encounter : person.getEncounters()) {
                         if (matchesLocation(encounter, location)) {
-                            writer.write(row);
+                            writer.write(contactPrefix + csvField(formatEncounter(encounter)));
                             writer.newLine();
                             matchedCount++;
                         }
@@ -99,6 +99,17 @@ public class ExportCommand extends Command {
     private static boolean matchesLocation(Encounter encounter, String targetLocation) {
         // Case-insensitive match; trim both sides to be forgiving of user input spacing.
         return encounter.location.trim().equalsIgnoreCase(targetLocation.trim());
+    }
+
+    private static String formatEncounter(Encounter encounter) {
+        // Keep it simple for the MVP: all encounter info goes into a single CSV field.
+        // (timestamp | location | description | outcome)
+        String outcomeStr = encounter.outcome.orElse("");
+        String outcomePart = outcomeStr.isEmpty() ? "" : " | outcome: " + outcomeStr;
+        return encounter.getFormattedDateTime()
+                + " | location: " + encounter.location
+                + " | description: " + encounter.description
+                + outcomePart;
     }
 
     private static String csvField(String value) {
