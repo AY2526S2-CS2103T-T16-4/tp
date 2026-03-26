@@ -28,7 +28,7 @@ AddressBook Level 3 (AB3) is a **desktop app for managing contacts, optimized fo
 
    * `list` : Lists all contacts.
 
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a contact named `John Doe` to the Address Book.
+   * `add n/John Doe a/311, Clementi Ave 2, #02-25 s/surveillance al/Johnny note/Met at cafe r/high t/friend` : Adds a contact named `John Doe` with stage and optional fields.
 
    * `delete 3` : Deletes the 3rd contact shown in the current list.
 
@@ -77,15 +77,24 @@ Format: `help`
 
 Adds a person to the address book.
 
-Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​`
+Format: `add n/NAME a/ADDRESS s/STAGE [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [t/TAG]...`
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-A person can have any number of tags (including 0)
+A person can have any number of tags (including 0), and aliases are comma-separated if more than one is provided.
 </div>
 
+Parameters:
+- `n/NAME` (required): contact name (alphanumeric + spaces, not blank)
+- `a/ADDRESS` (required): contact address
+- `s/STAGE` (required): one of `surveillance`, `approached`, `cooperating`, `arrested`, `closed` (case-insensitive)
+- `al/ALIAS(,ALIAS...)` (optional): alias list, comma-separated
+- `note/NOTES` (optional): notes up to 500 characters, no newlines
+- `r/RISK` (optional): one of `low`, `medium`, `high` (default: `medium`)
+- `t/TAG` (optional, repeatable): tag(s), alphanumeric
+
 Examples:
-* `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
+* `add n/John Doe a/311, Clementi Ave 2, #02-25 s/surveillance`
+* `add n/Michael Lee a/Marina Bay Sands s/approached al/Big Mike, MLee note/Seen at Marina Bay r/high t/priority t/network`
 
 ### Listing all persons : `list`
 
@@ -195,7 +204,7 @@ _Details coming soon ..._
 
 Action | Format, Examples
 --------|------------------
-**Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
+**Add** | `add n/NAME a/ADDRESS s/STAGE [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [t/TAG]...` <br> e.g., `add n/James Ho a/123, Clementi Rd, 1234665 s/surveillance al/JH note/Initial contact r/medium t/friend t/colleague`
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
