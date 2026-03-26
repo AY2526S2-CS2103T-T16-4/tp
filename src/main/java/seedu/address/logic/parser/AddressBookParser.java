@@ -87,7 +87,7 @@ public class AddressBookParser {
 
         case ExportCommand.COMMAND_WORD:
             return new ExportCommandParser().parse(arguments);
-            
+
         case SortCommand.COMMAND_WORD:
             return new SortCommandParser().parse(arguments);
 
