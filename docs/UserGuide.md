@@ -27,6 +27,7 @@ CrimeWatch is a CLI-based contact tracking tool for managing **person-of-interes
 | Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` |
 | View Contact | `view INDEX` |
 | Search Contacts | `find KEYWORD [MORE_KEYWORDS]` |
+
    
 * Table of Contents
 {:toc}
@@ -314,6 +315,38 @@ Retrieves contacts by keyword across multiple fields.
 
 --------------------------------------------------------------------------------------------------------------------
 
+### 6) Sort Contacts: `sort`
+
+Sorts the currently displayed contact list by a chosen criterion.
+
+**Format**
+`sort CRITERION`
+
+**Allowed criteria** (case-insensitive)
+- `location`
+- `tag`
+- `alphabetical`
+- `status`
+- `recent`
+
+**Examples**
+- `sort location`
+- `sort tag`
+- `sort alphabetical`
+- `sort status`
+- `sort recent`
+
+**Behaviour**
+- Sorting is applied to the displayed list view.
+- `sort location`: uses each contact's most recently logged encounter location; contacts without encounters appear last.
+- `sort tag`: uses each contact's alphabetically smallest tag; contacts without tags appear last.
+- `sort alphabetical`: sorts by contact name (A-Z).
+- `sort status`: sorts by stage/status alphabetically.
+- `sort recent`: sorts by most recently encountered first.
+- Ties are resolved by contact name in alphabetical order.
+
+--------------------------------------------------------------------------------------------------------------------
+
 ### Clearing all entries : `clear`
 
 Clears all entries from the address book.
@@ -370,3 +403,4 @@ Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOM
 Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` | `editencounter 1 1 desc/Updated notes`
 View Contact | `view INDEX` | `view 1`
 Search Contacts | `find KEYWORD [MORE_KEYWORDS]` | `find mike marina`
+Sort Contacts | `sort CRITERION` | `sort location`
