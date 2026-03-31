@@ -16,6 +16,7 @@ public class CliSyntax {
     public static final Prefix PREFIX_TAG = new Prefix("t/");
     public static final Prefix PREFIX_STAGE = new Prefix("s/");
     public static final Prefix PREFIX_PASSWORD = new Prefix("pw/");
+    public static final Prefix PREFIX_REMARK = new Prefix("rm/");
 
     /* Log command prefix definitions */
     public static final Prefix PREFIX_DATE = new Prefix("d/");
