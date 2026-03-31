@@ -31,18 +31,29 @@ No programming experience is required.
 
 ### Key Features
 
-CrimeWatch supports 10 core features: **Add**, **Edit**, **Delete** contacts | **Log** and **Edit** encounters | **View** contact details | **Set reminders** | **Search** by keywords | **Export** to CSV | **Sort** the contact list. See [Command summary](#command-summary) for detailed formats.
+CrimeWatch supports 11 core features: **Add**, **Edit**, **Delete** contacts | **Log** and **Edit** encounters | **View** contact details | **Set reminders** | **Search** by keywords | **Export** to CSV | **Sort** the contact list | **Protect** sensitive contacts with passwords. See [Command summary](#command-summary) for detailed formats.
+
+### Password Feature
+
+Optional, contact-level password protection. Each contact can be protected with a password to restrict viewing its full details.
+
+| Feature | Description |
+|---------|-------------|
+| **Scope** | Per-contact (individual contacts can be protected) |
+| **Type** | Optional (contacts do not require passwords) |
+| **Usage** | Add `pw/PASSWORD` to `add` or `edit` commands to protect; provide it with `view` to access |
+| **Validation** | Alphanumeric characters and spaces only |
 
 ## Command summary
 
 | Feature | Command format |
 | --- | --- |
-| Add Contact | `add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES]` |
-| Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [t/TAG]...` |
+| Add Contact | `add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES] [pw/PASSWORD]` |
+| Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` |
 | Delete Contact | `delete INDEX` |
 | Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME]` |
 | Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` |
-| View Contact | `view INDEX` |
+| View Contact | `view INDEX [pw/PASSWORD]` |
 | Set Reminder | `remind INDEX d/DATE t/TIME note/NOTE` |
 | Search Contacts | `find KEYWORD [MORE_KEYWORDS]` |
 | Export encounters (CSV) | `export l/LOCATION` |
@@ -125,7 +136,7 @@ Format: `help`
 Creates a new suspect profile with aliases, investigation stage, and risk level.
 
 **Format**
-`add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES]`
+`add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES] [pw/PASSWORD]`
 
 **Parameters**
 - `n/NAME` (required): suspect's full name (alphanumeric + spaces, not blank)
@@ -133,10 +144,12 @@ Creates a new suspect profile with aliases, investigation stage, and risk level.
 - `s/STAGE` (required): investigation stage
 - `r/RISK` (optional): risk level—one of `low`, `medium`, `high` (default: `medium`)
 - `note/NOTES` (optional): initial notes (up to 500 characters, no newlines)
+- `pw/PASSWORD` (optional): per-contact password used to restrict viewing full contact details
 
 **Examples**
 - `add n/John Tan a/Ah Boy s/surveillance`
 - `add n/Michael Lee a/Big Mike s/approached r/high note/Seen at Marina Bay`
+- `add n/John Doe a/JD s/surveillance pw/password123`
 
 #### Validation rules
 
@@ -159,6 +172,9 @@ Allowed values: `surveillance`, `approached`, `cooperating`, `arrested`, `closed
 **RISK** (optional)
 Allowed values: `low`, `medium`, `high` (default: `medium`)
 
+**PASSWORD** (optional)
+- Allowed characters: alphanumeric and spaces only
+
 #### Duplicate detection
 A new contact is considered a duplicate if:
 - NAME is identical (case-insensitive, trimmed), **and**
@@ -176,7 +192,7 @@ Error if duplicate: `Duplicate contact detected. A contact with similar name and
 Updates details of an existing contact without deleting and re-adding the profile.
 
 **Format**
-`edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [t/TAG]...`
+`edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...`
 
 **Parameters**
 - `INDEX` (compulsory): target contact in current list
@@ -186,6 +202,8 @@ Updates details of an existing contact without deleting and re-adding the profil
 **Examples**
 - `edit 1 p/91234567 e/johndoe@example.com`
 - `edit 2 r/high note/More cooperative in latest meeting`
+- `edit 1 pw/newpassword`
+- `edit 1 pw/`
 
 **Validation**
 - INDEX must exist in the current list.
@@ -281,7 +299,13 @@ Updates an existing encounter for a contact.
 Displays the full profile of a contact and their chronological encounter history.
 
 **Format**
-`view INDEX`
+`view INDEX [pw/PASSWORD]`
+
+**Password behavior**
+- Without password: contact is viewable normally.
+- With password: `view` requires the correct `pw/PASSWORD` to display full details.
+- `view INDEX` on a protected contact fails with password-required error.
+- Passwords are stored in plain text (not production-ready).
 
 **Output (view panel)**
 - Name
@@ -399,8 +423,6 @@ Sorts the currently displayed contact list by a chosen criterion.
 - `sort recent`: sorts by most recently encountered first.
 - Ties are resolved by contact name in alphabetical order.
 
---------------------------------------------------------------------------------------------------------------------
-
 ### Clearing all entries : `clear`
 
 Clears all entries from the address book.
@@ -426,7 +448,7 @@ If your changes to the data file makes its format invalid, AddressBook will disc
 Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
 </div>
 
-### Archiving data files `[coming in v2.0]`
+### Archiving data files `[coming in v1.6]`
 
 _Details coming soon ..._
 
@@ -471,12 +493,12 @@ _Details coming soon ..._
 
 Action | Format | Example
 ---|---|---
-Add Contact | `add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES]` | `add n/John Tan a/Ah Boy s/surveillance`
-Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [t/TAG]...` | `edit 1 p/91234567 r/high`
+Add Contact | `add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES] [pw/PASSWORD]` | `add n/John Tan a/Ah Boy s/surveillance pw/password123`
+Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` | `edit 1 pw/newpassword`
 Delete Contact | `delete INDEX` | `delete 3`
 Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME]` | `log 1 d/2026-02-21 t/18:30 l/Maxwell Road desc/Met...`
 Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` | `editencounter 1 1 desc/Updated notes`
-View Contact | `view INDEX` | `view 1`
+View Contact | `view INDEX [pw/PASSWORD]` | `view 1 pw/password123`
 Set Reminder | `remind INDEX d/DATE t/TIME note/NOTE` | `remind 1 d/2026-03-28 t/20:00 note/Meet informant`
 Search Contacts | `find KEYWORD [MORE_KEYWORDS]` | `find mike marina`
 Export encounters (CSV) | `export l/LOCATION` | `export l/Harbor District`
