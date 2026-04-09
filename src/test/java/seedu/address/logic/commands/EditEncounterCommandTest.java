@@ -280,6 +280,22 @@ public class EditEncounterCommandTest {
     }
 
     @Test
+    public void execute_success_returnsEditedPersonToView() throws Exception {
+        Person original = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person withEncounter = new PersonBuilder(original).withEncounters(OLDER_ENCOUNTER).build();
+        model.setPerson(original, withEncounter);
+
+        EditEncounterDescriptor descriptor = new EditEncounterDescriptor();
+        descriptor.setDescription("Updated description");
+        EditEncounterCommand command = new EditEncounterCommand(INDEX_FIRST_PERSON, Index.fromOneBased(1), descriptor);
+
+        CommandResult result = command.execute(model);
+        assertTrue(result.getPersonToView().isPresent());
+        assertEquals(model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()),
+                result.getPersonToView().get());
+    }
+
+    @Test
     public void equals() {
         EditEncounterDescriptor descriptor1 = new EditEncounterDescriptor();
         descriptor1.setDescription("Desc 1");
