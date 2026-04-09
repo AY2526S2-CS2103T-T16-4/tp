@@ -156,6 +156,8 @@ public class LogCommandTest {
         Person updatedPerson = new PersonBuilder(protectedPerson)
                 .withEncounters(ENCOUNTER_NO_OUTCOME)
                 .build();
+        assertTrue(updatedPerson.hasPassword());
+        assertTrue(updatedPerson.isPasswordMatch("hunter2"));
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(protectedPerson, updatedPerson);
