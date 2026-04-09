@@ -40,7 +40,7 @@ No programming experience is required.
 
 ### Key Features
 
-CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts; **Log** and **Edit** encounters; **View** contact details; **Set reminders**; **Search** contacts by name and/or tags (`find`); **Export** to CSV; **Sort** the contact list; and **Protect** sensitive contacts with passwords. See [Command summary](#command-summary) for detailed formats.
+CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts; **Log** and **Edit** encounters; **View** contact details; **Set reminders**; **Search** contacts by name, alias, and/or tags (`find`); **Export** to CSV; **Sort** the contact list; and **Protect** sensitive contacts with passwords. See [Command summary](#command-summary) for detailed formats.
 
 ## Command summary
 
@@ -347,22 +347,22 @@ Displays the full profile of a contact and their encounter cards.
 
 ### 8) Search Contacts: `find`
 
-Filters the contact list by **name keywords** (optional) and/or **tags** (optional). You must supply at least one name keyword or one tag.
+Filters the contact list by **name or alias keywords** (optional) and/or **tags** (optional). You must supply at least one name keyword or one tag.
 
 **Format**
 `find [NAME_KEYWORD]... [t/TAG]...`
 
 **Examples**
 - `find john`
-- `find mike marina` — matches if **any** name keyword matches (see below).
+- `find mike marina` — matches if **any** name or alias keyword matches (see below).
 - `find t/suspect t/wanted` — matches contacts that have **any** of these tags.
 - `find alice t/suspect` — matches only if the contact satisfies **both**: name criteria **and** tag criteria (not either alone).
 
 **Behavior**
-- **Name keywords** (text before any `t/`): case-insensitive; each keyword must match a **whole word** in the contact’s **name**. If you give several name keywords, a contact matches if **any** of those words appears in the name.
+- **Name keywords** (text before any `t/`): case-insensitive; each keyword must match a **whole word** in the contact’s **name or aliases**. If you give several name keywords, a contact matches if **any** of those words appears in the name or aliases.
 - **Tags**: use `t/TAG` (alphanumeric tag names only). You can repeat `t/` for multiple tags; a contact matches if it has **any** of the listed tags.
 - **Name + tags in the same command**: the contact must match the **name** part **and** the **tag** part together (**AND**), not one or the other.
-- Aliases and notes are **not** searched by `find`.
+- Notes are **not** searched by `find`.
 - Result count is shown as `X persons listed!` (including `0 persons listed!` when nothing matches).
 
 --------------------------------------------------------------------------------------------------------------------
@@ -474,8 +474,8 @@ _Details coming soon ..._
 **Q: What if I need to modify an encounter record I logged earlier?**<br>
 **A**: Use the `editencounter` command with the person index and encounter index. Type `view INDEX` first to see all encounters for that suspect, then identify which encounter to edit.
 
-**Q: How do I search for a suspect if I only remember part of their name, or a tag?**<br>
-**A**: Use `find` with name keywords and/or `t/TAG`. Name matching is case-insensitive by **whole word** in the contact’s **name** only (aliases and notes are not searched). Example: `find mike` or `find t/highrisk`. To require both a name and a tag, combine them, e.g. `find alex t/suspect` (**and**, not or).
+**Q: How do I search for a suspect if I only remember part of their name, alias, or a tag?**<br>
+**A**: Use `find` with name keywords and/or `t/TAG`. Name matching is case-insensitive by **whole word** in the contact’s **name or aliases** (notes are not searched). Example: `find mike` or `find t/highrisk`. To require both a name and a tag, combine them, e.g. `find alex t/suspect` (**and**, not or).
 
 **Q: Can I track the same suspect across multiple investigation stages?**<br>
 **A**: Yes. Use the `edit` command to update the `s/STAGE` field as the investigation progresses (e.g., from `surveillance` to `arrested` to `closed`).
