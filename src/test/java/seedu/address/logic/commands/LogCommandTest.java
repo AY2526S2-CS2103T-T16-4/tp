@@ -72,7 +72,8 @@ public class LogCommandTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(personToLog, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
     }
 
     @Test
@@ -92,7 +93,8 @@ public class LogCommandTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(personToLog, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
     }
 
     @Test
@@ -118,7 +120,8 @@ public class LogCommandTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(personWithOne, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
     }
 
     @Test
@@ -159,7 +162,8 @@ public class LogCommandTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(personWithReminder, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
     }
 
     @Test
@@ -182,7 +186,8 @@ public class LogCommandTest {
         CommandTestUtil.showPersonAtIndex(expectedModel, INDEX_FIRST_PERSON);
         expectedModel.setPerson(personToLog, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
     }
 
     @Test
@@ -208,7 +213,19 @@ public class LogCommandTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(protectedPerson, updatedPerson);
 
-        assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
+        CommandResult expectedResult = new CommandResult(expectedMessage, updatedPerson);
+        assertCommandSuccess(logCommand, model, expectedResult, expectedModel);
+    }
+
+    @Test
+    public void execute_success_returnsLoggedPersonToView() throws Exception {
+        LogCommand logCommand = new LogCommand(INDEX_FIRST_PERSON, ENCOUNTER_NO_OUTCOME);
+
+        CommandResult result = logCommand.execute(model);
+
+        assertTrue(result.getPersonToView().isPresent());
+        assertEquals(model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()),
+                result.getPersonToView().get());
     }
 
     // ── execute: failures ────────────────────────────────────────────────────
