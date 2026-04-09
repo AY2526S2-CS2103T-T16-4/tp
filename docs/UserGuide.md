@@ -40,20 +40,20 @@ No programming experience is required.
 
 ### Key Features
 
-CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts; **Log** and **Edit** encounters; **View** contact details; **Set reminders**; **Search** by keywords; **Export** to CSV; **Sort** the contact list; and **Protect** sensitive contacts with passwords. See [Command summary](#command-summary) for detailed formats.
+CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts; **Log** and **Edit** encounters; **View** contact details; **Set reminders**; **Search** contacts by name, alias, and/or tags (`find`); **Export** to CSV; **Sort** the contact list; and **Protect** sensitive contacts with passwords. See [Command summary](#command-summary) for detailed formats.
 
 ## Command summary
 
 | Feature | Command format | Go to |
 | --- | --- | --- |
-| Add Contact | `add n/NAME a/ALIAS s/STAGE [r/RISK] [note/NOTES] [pw/PASSWORD]` | [1) Add Contact](#1-add-contact-add) |
+| Add Contact | `add n/NAME p/PHONE e/EMAIL a/ADDRESS s/STAGE [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` | [1) Add Contact](#1-add-contact-add) |
 | Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` | [2) Edit Contact](#2-edit-contact-edit) |
 | Delete Contact | `delete INDEX` | [3) Delete Contact](#3-delete-contact-delete) |
 | Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME]` | [4) Log Encounter](#4-log-encounter-log) |
 | Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` | [5) Edit Encounter](#5-edit-encounter-editencounter) |
 | View Contact | `view INDEX [pw/PASSWORD]` | [6) View Contact](#6-view-contact-view) |
 | Set Reminder | `remind INDEX d/DATE t/TIME note/NOTE` | [7) Set Reminder](#7-set-reminder-remind) |
-| Search Contacts | `find KEYWORD [MORE_KEYWORDS]` | [8) Search Contacts](#8-search-contacts-find) |
+| Search Contacts | `find [NAME_KEYWORD]... [t/TAG]...` | [8) Search Contacts](#8-search-contacts-find) |
 | Export encounters (CSV) | `export l/LOCATION` | [9) Export encounters](#9-export-encounters-to-csv-export) |
 | Sort Contacts | `sort CRITERION` | [10) Sort Contacts](#10-sort-contacts-sort) |
 | Clear All Data | `clear` | [11) Clear All Data](#11-clear-all-data-clear) |
@@ -92,7 +92,7 @@ CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts
 6. Try this 60-second typed-command tutorial:
    - `help` to open this user guide.
    - `list` to show all contacts.
-   - `add n/John Doe a/JD s/surveillance r/high note/Observed near station` to add a suspect profile.
+   - `add n/John Doe p/98765432 e/john@example.com a/Maxwell Road s/surveillance al/JD r/high note/Observed near station` to add a suspect profile.
    - `view 1` to inspect the first contact.
    - `log 1 d/2026-03-31 t/21:15 l/Maxwell Road desc/Short conversation out/Agreed to follow up` to log an encounter.
 
@@ -148,30 +148,34 @@ Format: `help`
 
 ### 1) Add Contact: `add`
 
-Creates a new suspect profile with aliases, investigation stage, and risk level.
+Creates a new suspect profile.
 
 **Format**
-`add n/NAME al/ALIAS s/STAGE [r/RISK] [note/NOTES] [pw/PASSWORD]`
+`add n/NAME p/PHONE e/EMAIL a/ADDRESS s/STAGE [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...`
 
 **Parameters**
 - `n/NAME` (required): suspect's full name (alphanumeric + spaces, not blank)
-- `al/ALIAS` (required): one or more aliases, **comma-separated** (e.g. `a/Ah Boy, Johnny T`)
-- `s/STAGE` (required): investigation stage
-- `r/RISK` (optional): risk level—one of `low`, `medium`, `high` (default: `medium`)
-- `note/NOTES` (optional): initial notes (up to 500 characters, no newlines)
-- `pw/PASSWORD` (optional): per-contact password used to restrict viewing full contact details
+- `p/PHONE` (required): phone number (digits only, at least 3 digits)
+- `e/EMAIL` (required): valid email address
+- `a/ADDRESS` (required): address (not blank)
+- `s/STAGE` (required): one of `surveillance`, `approached`, `cooperating`, `arrested`, `closed`
+- `al/ALIAS(,ALIAS...)` (optional): alias list, comma-separated
+- `note/NOTES` (optional): notes up to 500 characters, no newlines
+- `r/RISK` (optional): one of `low`, `medium`, `high` (default: `medium`)
+- `pw/PASSWORD` (optional): contact-level password for `view`
+- `t/TAG` (optional, repeatable): tags
 
 **Examples**
-- `add n/John Tan a/Ah Boy s/surveillance`
-- `add n/Michael Lee a/Big Mike s/approached r/high note/Seen at Marina Bay`
-- `add n/John Doe a/JD s/surveillance pw/password123`
+- `add n/John Tan p/98765432 e/johntan@example.com a/311, Clementi Ave 2, #02-25 s/surveillance`
+- `add n/Michael Lee p/91234567 e/mlee@example.com a/Marina Bay s/approached al/Big Mike, MLee note/Seen at Marina Bay r/high t/priority`
+- `add n/John Doe p/87654321 e/john@example.com a/Maxwell Road s/surveillance pw/password123`
 
 **Validation**
-- Names must be unique
 - All required fields must be present
+- Repeating single-value prefixes in the same command is not allowed
 
 **Success output**
-`New contact added: [Name] (Stage: X, Risk: Y)`
+`New person added: [person details]`
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -341,21 +345,23 @@ Displays the full profile of a contact and their chronological encounter history
 
 ### 8) Search Contacts: `find`
 
-Retrieves contacts by keyword across multiple fields.
+Filters the contact list by **name or alias keywords** (optional) and/or **tags** (optional). You must supply at least one name keyword or one tag.
 
 **Format**
-`find KEYWORD [MORE_KEYWORDS]`
+`find [NAME_KEYWORD]... [t/TAG]...`
 
 **Examples**
 - `find john`
-- `find mike marina`
+- `find mike marina` — matches if **any** name or alias keyword matches (see below).
+- `find t/suspect t/wanted` — matches contacts that have **any** of these tags.
+- `find alice t/suspect` — matches only if the contact satisfies **both**: name criteria **and** tag criteria (not either alone).
 
 **Behavior**
-- Case-insensitive
-- Partial match allowed
-- Matched fields: **Name**, **Alias**, **Notes**
-- If no matches:
-  `No contacts found matching the given keywords.`
+- **Name keywords** (text before any `t/`): case-insensitive; each keyword must match a **whole word** in the contact’s **name or aliases**. If you give several name keywords, a contact matches if **any** of those words appears in the name or aliases.
+- **Tags**: use `t/TAG` (alphanumeric tag names only). You can repeat `t/` for multiple tags; a contact matches if it has **any** of the listed tags.
+- **Name + tags in the same command**: the contact must match the **name** part **and** the **tag** part together (**AND**), not one or the other.
+- Notes are **not** searched by `find`.
+- Result count is shown as `X persons listed!` (including `0 persons listed!` when nothing matches).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -466,8 +472,8 @@ _Details coming soon ..._
 **Q: What if I need to modify an encounter record I logged earlier?**<br>
 **A**: Use the `editencounter` command with the person index and encounter index. Type `view INDEX` first to see all encounters for that suspect, then identify which encounter to edit.
 
-**Q: How do I search for a suspect if I only remember part of their name or alias?**<br>
-**A**: Use the `find` command with a keyword. The search is case-insensitive and matches across names, aliases, and notes. For example: `find mike marina`.
+**Q: How do I search for a suspect if I only remember part of their name, alias, or a tag?**<br>
+**A**: Use `find` with name keywords and/or `t/TAG`. Name matching is case-insensitive by **whole word** in the contact’s **name or aliases** (notes are not searched). Example: `find mike` or `find t/highrisk`. To require both a name and a tag, combine them, e.g. `find alex t/suspect` (**and**, not or).
 
 **Q: Can I track the same suspect across multiple investigation stages?**<br>
 **A**: Yes. Use the `edit` command to update the `s/STAGE` field as the investigation progresses (e.g., from `surveillance` to `arrested` to `closed`).

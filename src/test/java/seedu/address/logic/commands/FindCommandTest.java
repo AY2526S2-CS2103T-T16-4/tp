@@ -11,14 +11,14 @@ import static seedu.address.testutil.TypicalPersons.FIONA;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.NameAndTagContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -31,10 +31,10 @@ public class FindCommandTest {
 
     @Test
     public void equals() {
-        NameContainsKeywordsPredicate firstPredicate =
-                new NameContainsKeywordsPredicate(Arrays.asList("first"));
-        NameContainsKeywordsPredicate secondPredicate =
-                new NameContainsKeywordsPredicate(Arrays.asList("second"));
+        NameAndTagContainsKeywordsPredicate firstPredicate =
+                new NameAndTagContainsKeywordsPredicate(Arrays.asList("first"), Collections.emptySet());
+        NameAndTagContainsKeywordsPredicate secondPredicate =
+                new NameAndTagContainsKeywordsPredicate(Arrays.asList("second"), Collections.emptySet());
 
         FindCommand findFirstCommand = new FindCommand(firstPredicate);
         FindCommand findSecondCommand = new FindCommand(secondPredicate);
@@ -59,8 +59,8 @@ public class FindCommandTest {
     @Test
     public void execute_zeroKeywords_noPersonFound() {
         String expectedMessage = String.format(MESSAGE_PERSONS_LISTED_OVERVIEW, 0);
-        NameContainsKeywordsPredicate predicate =
-                new NameContainsKeywordsPredicate(Arrays.asList());
+        NameAndTagContainsKeywordsPredicate predicate =
+                new NameAndTagContainsKeywordsPredicate(Collections.emptyList(), Collections.emptySet());
         FindCommand command = new FindCommand(predicate);
         expectedModel.updateFilteredPersonList(predicate);
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
@@ -70,7 +70,7 @@ public class FindCommandTest {
     @Test
     public void execute_multipleKeywords_multiplePersonsFound() {
         String expectedMessage = String.format(MESSAGE_PERSONS_LISTED_OVERVIEW, 3);
-        NameContainsKeywordsPredicate predicate = preparePredicate("Kurz Elle Kunz");
+        NameAndTagContainsKeywordsPredicate predicate = preparePredicate("Kurz Elle Kunz");
         FindCommand command = new FindCommand(predicate);
         expectedModel.updateFilteredPersonList(predicate);
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
@@ -86,26 +86,27 @@ public class FindCommandTest {
         expectedModel.addPerson(aliasPerson);
 
         String expectedMessage = String.format(MESSAGE_PERSONS_LISTED_OVERVIEW, 1);
-        NameContainsKeywordsPredicate predicate = preparePredicate("Shadow");
+        NameAndTagContainsKeywordsPredicate predicate = preparePredicate("Shadow");
         FindCommand command = new FindCommand(predicate);
         expectedModel.updateFilteredPersonList(predicate);
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
-        assertEquals(List.of(aliasPerson), model.getFilteredPersonList());
+        assertEquals(Collections.singletonList(aliasPerson), model.getFilteredPersonList());
     }
 
     @Test
     public void toStringMethod() {
-        NameContainsKeywordsPredicate predicate =
-                new NameContainsKeywordsPredicate(Arrays.asList("keyword"));
+        NameAndTagContainsKeywordsPredicate predicate =
+                new NameAndTagContainsKeywordsPredicate(Arrays.asList("keyword"), Collections.emptySet());
         FindCommand findCommand = new FindCommand(predicate);
         String expected = FindCommand.class.getCanonicalName() + "{predicate=" + predicate + "}";
         assertEquals(expected, findCommand.toString());
     }
 
     /**
-     * Parses {@code userInput} into a {@code NameContainsKeywordsPredicate}.
+     * Parses {@code userInput} into a {@code NameAndTagContainsKeywordsPredicate} with name keywords only.
      */
-    private NameContainsKeywordsPredicate preparePredicate(String userInput) {
-        return new NameContainsKeywordsPredicate(Arrays.asList(userInput.split("\\s+")));
+    private NameAndTagContainsKeywordsPredicate preparePredicate(String userInput) {
+        return new NameAndTagContainsKeywordsPredicate(Arrays.asList(userInput.split("\\s+")),
+                Collections.emptySet());
     }
 }
