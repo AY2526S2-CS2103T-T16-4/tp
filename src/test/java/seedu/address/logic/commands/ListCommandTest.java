@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.Person;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for ListCommand.
@@ -45,7 +46,8 @@ public class ListCommandTest {
     @Test
     public void execute_afterSort_restoresOriginalOrder() {
         model.setPersonSortComparator(
-                Comparator.comparing((seedu.address.model.person.Person person) -> person.getName().fullName).reversed());
+                Comparator.comparing((Person person) -> person.getName().fullName)
+                        .reversed());
 
         assertCommandSuccess(new ListCommand(), model, ListCommand.MESSAGE_SUCCESS, expectedModel);
         assertEquals(ALICE, model.getFilteredPersonList().get(0));
