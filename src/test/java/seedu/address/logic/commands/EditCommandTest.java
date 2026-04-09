@@ -232,6 +232,18 @@ public class EditCommandTest {
     }
 
     @Test
+    public void execute_success_returnsEditedPersonToView() throws Exception {
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withRisk(VALID_RISK_HIGH).build();
+        EditCommand editCommand = new EditCommand(INDEX_FIRST_PERSON, descriptor);
+
+        CommandResult result = editCommand.execute(model);
+
+        assertTrue(result.getPersonToView().isPresent());
+        assertEquals(model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()),
+                result.getPersonToView().get());
+    }
+
+    @Test
     public void equals() {
         final EditCommand standardCommand = new EditCommand(INDEX_FIRST_PERSON, DESC_AMY);
 

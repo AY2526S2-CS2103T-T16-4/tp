@@ -211,6 +211,17 @@ public class LogCommandTest {
         assertCommandSuccess(logCommand, model, expectedMessage, expectedModel);
     }
 
+    @Test
+    public void execute_success_returnsLoggedPersonToView() throws Exception {
+        LogCommand logCommand = new LogCommand(INDEX_FIRST_PERSON, ENCOUNTER_NO_OUTCOME);
+
+        CommandResult result = logCommand.execute(model);
+
+        assertTrue(result.getPersonToView().isPresent());
+        assertEquals(model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased()),
+                result.getPersonToView().get());
+    }
+
     // ── execute: failures ────────────────────────────────────────────────────
 
     @Test
