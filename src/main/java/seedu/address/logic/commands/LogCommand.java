@@ -95,6 +95,7 @@ public class LogCommand extends Command {
         var notes = personToLog.getNotes();
         var risk = personToLog.getRisk();
         var tags = personToLog.getTags();
+        var reminders = personToLog.getReminders();
         var password = personToLog.getPassword();
 
         return new Person(
@@ -108,6 +109,7 @@ public class LogCommand extends Command {
                 risk,
                 tags,
                 updatedEncounters,
+                reminders,
                 password);
     }
 
