@@ -238,6 +238,48 @@ public class EditEncounterCommandTest {
     }
 
     @Test
+    public void execute_protectedContact_passwordPreserved() {
+        Person original = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person protectedPerson = new PersonBuilder(original)
+                .withEncounters(OLDER_ENCOUNTER)
+                .withPassword("hunter2")
+                .build();
+        model.setPerson(original, protectedPerson);
+
+        EditEncounterDescriptor descriptor = new EditEncounterDescriptor();
+        descriptor.setDescription("Updated description");
+        EditEncounterCommand command = new EditEncounterCommand(INDEX_FIRST_PERSON, Index.fromOneBased(1), descriptor);
+
+        Encounter edited = new Encounter(
+                LocalDateTime.of(2026, 3, 20, 10, 30),
+                "Chinatown",
+                "Updated description",
+                Optional.of("Observed"));
+        Person expectedEditedPerson = new Person(
+                protectedPerson.getName(),
+                protectedPerson.getPhone(),
+                protectedPerson.getEmail(),
+                protectedPerson.getAddress(),
+                protectedPerson.getStage(),
+                protectedPerson.getAliases(),
+                protectedPerson.getNotes(),
+                protectedPerson.getRisk(),
+                protectedPerson.getTags(),
+                List.of(edited),
+                protectedPerson.getReminders(),
+                protectedPerson.getPassword());
+        assertTrue(expectedEditedPerson.hasPassword());
+        assertTrue(expectedEditedPerson.isPasswordMatch("hunter2"));
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(protectedPerson, expectedEditedPerson);
+
+        String expectedMessage = String.format(
+                EditEncounterCommand.MESSAGE_SUCCESS, 1, protectedPerson.getName());
+        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+    }
+
+    @Test
     public void equals() {
         EditEncounterDescriptor descriptor1 = new EditEncounterDescriptor();
         descriptor1.setDescription("Desc 1");
