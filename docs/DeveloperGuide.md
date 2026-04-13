@@ -384,6 +384,7 @@ edit 1 pw/              # Remove protection
 ```
 
 ### View protected contact
+
 view 1 pw/password123   # Show full details if password correct
 view 1                  # Error: password required
 
@@ -810,3 +811,40 @@ Given below are manual tests for major functional paths and edge cases.
 3. Dealing with missing/corrupted data files
    1. Corrupt or remove the data file, then relaunch the app.
    1. Expected: the app handles the read failure gracefully and reports a clear error instead of crashing silently.
+
+--------------------------------------------------------------------------------------------------------------------
+
+## Appendix: Planned Enhancements
+
+This section documents known feature limitations that are intended to be addressed in a future version of CrimeWatch. These items have been identified but are out of scope for the current release.
+
+**Team size: 4**
+
+The maximum number of planned enhancements listed here is 8 (2 × team size).
+
+---
+
+**1. Add `deleteencounter` and `deletereminder` commands**
+
+Currently, there is no way to delete an individual encounter from a contact's encounter history or remove a reminder, short of deleting the entire contact. A future version will introduce:
+- `deleteencounter PERSON_INDEX enc/ENCOUNTER_INDEX` — removes a specific encounter from a contact's history
+- `deletereminder PERSON_INDEX rem/REMINDER_INDEX` — removes a specific reminder from a contact
+
+This will prevent encounter logs from accumulating erroneous or cancelled entries, improving data quality without requiring full contact deletion.
+
+---
+
+**2. Add `sort address` command**
+
+The current `sort location` command sorts contacts by the location of their most recent logged encounter, which may be unintuitive to users expecting it to sort by the contact's stored home/work address. A future version will add a distinct `sort address` command that sorts contacts alphabetically by their `a/ADDRESS` field, complementing `sort location`.
+
+---
+
+**3. Extend `find` to support `ADDRESS`, `STAGE`, and `RISK` filters**
+
+Currently, `find` only searches by name, alias, and tag. A future version will extend `find` to accept additional prefix filters:
+- `a/ADDRESS` — filter contacts whose address contains the given keyword
+- `s/STAGE` — filter contacts at a specific stage (e.g. `surveillance`, `cooperating`)
+- `r/RISK` — filter contacts by risk level (e.g. `high`, `medium`, `low`)
+
+This allows investigators to narrow down contacts more precisely (e.g. all high-risk contacts currently under surveillance).
