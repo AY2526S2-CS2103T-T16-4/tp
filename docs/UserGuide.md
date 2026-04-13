@@ -49,13 +49,13 @@ CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts
 | Add Contact | `add n/NAME p/PHONE e/EMAIL a/ADDRESS s/STAGE [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` | [1) Add Contact](#1-add-contact-add) |
 | Edit Contact | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [s/STAGE] [al/ALIAS(,ALIAS...)] [note/NOTES] [r/RISK] [pw/PASSWORD] [t/TAG]...` | [2) Edit Contact](#2-edit-contact-edit) |
 | Delete Contact | `delete INDEX` | [3) Delete Contact](#3-delete-contact-delete) |
-| Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME]` | [4) Log Encounter](#4-log-encounter-log) |
+| Log Encounter | `log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME] [pw/PASSWORD]` | [4) Log Encounter](#4-log-encounter-log) |
 | Edit Encounter | `editencounter PERSON_INDEX ENCOUNTER_INDEX [d/DATE] [t/TIME] [l/LOCATION] [desc/DESCRIPTION] [out/OUTCOME]` | [5) Edit Encounter](#5-edit-encounter-editencounter) |
+| Set Reminder | `remind INDEX d/DATE t/TIME note/NOTE [pw/PASSWORD]` | [6) Set Reminder](#6-set-reminder-remind) |
 | View Contact | `view INDEX [pw/PASSWORD]` | [7) View Contact](#7-view-contact-view) |
-| Set Reminder | `remind INDEX d/DATE t/TIME note/NOTE` | [6) Set Reminder](#6-set-reminder-remind) |
 | Search Contacts | `find [NAME_KEYWORD]... [t/TAG]...` | [8) Search Contacts](#8-search-contacts-find) |
-| Export encounters (CSV) | `export l/LOCATION` | [10) Export encounters](#10-export-encounters-to-csv-export) |
 | Sort Contacts | `sort CRITERION` | [9) Sort Contacts](#9-sort-contacts-sort) |
+| Export encounters (CSV) | `export l/LOCATION` | [10) Export encounters](#10-export-encounters-to-csv-export) |
 | Clear All Data | `clear` | [11) Clear All Data](#11-clear-all-data-clear) |
 | Exit Application | `exit` | [12) Exit Application](#12-exit-application-exit) |
 
@@ -87,7 +87,7 @@ CrimeWatch supports 11 core features: **Add**, **Edit**, and **Delete** contacts
    ![Opening the .jar file](images/ug-terminal-command.png)
 
 6. Confirm the app opens and sample data is visible.
-   ![Ui](images/Ui.png)
+   ![Ui](images/Ui-new.png)
 
 7. Try this 60-second typed-command tutorial:
    - `help` to open this user guide.
@@ -186,15 +186,17 @@ Updates details of an existing contact without deleting and re-adding the profil
 
 **Parameters**
 - `INDEX` (compulsory): target contact in current list
-- At least one prefixed field must be provided
+- At least one prefixed field must be provided (including `pw/` alone when allowed)
 - Any omitted field remains unchanged
+- **`pw/PASSWORD`:** If the contact **already has** a password, use this to supply the **current** password so the edit is allowed (for example `edit 1 n/NewName pw/oldSecret`). If the contact **does not** have a password, `pw/` **sets** a new password (`pw/newpassword`) or **clears** it with `pw/` (empty value).
 - `p/PHONE` (optional): Singapore phone number, exactly 8 digits and must start with `6`, `8`, or `9`
 
 **Examples**
 - `edit 1 p/91234567 e/johndoe@example.com`
 - `edit 2 r/high note/More cooperative in latest meeting`
-- `edit 1 pw/newpassword`
-- `edit 1 pw/`
+- `edit 1 pw/newpassword` (only when the contact is not password-protected yet)
+- `edit 1 pw/` (remove password protection, only when the contact is not password-protected)
+- `edit 1 n/UpdatedName pw/oldSecret` (required when the contact already has a password)
 
 **Validation**
 - INDEX must exist in the current list.
@@ -204,6 +206,8 @@ Updates details of an existing contact without deleting and re-adding the profil
 
 **Success output**
 `Edited Person: [person details]`
+
+> **Note:** After a successful `edit` command, the view panel will automatically update to display the edited contact, even if a different contact was previously shown via `view`. To view a different contact again, use the `view` command explicitly.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -231,7 +235,7 @@ Removes a contact permanently, including all associated encounters and reminders
 Records an interaction with a contact and appends it to the contact’s encounter history.
 
 **Format**
-`log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME]`
+`log INDEX d/DATE t/TIME l/LOCATION desc/DESCRIPTION [out/OUTCOME] [pw/PASSWORD]`
 
 **Parameters**
 - `d/DATE` (compulsory): `YYYY-MM-DD`
@@ -239,9 +243,13 @@ Records an interaction with a contact and appends it to the contact’s encounte
 - `l/LOCATION` (compulsory): location text
 - `desc/DESCRIPTION` (compulsory): what happened (1–500 chars, not blank)
 - `out/OUTCOME` (optional): result/follow-up (up to 300 chars)
+- **`pw/PASSWORD`:** if the contact is password-protected, supply the **current** password (same as for `edit`, `view`, and `remind`).
 
 **Example**
 `log 1 d/2026-02-21 t/18:30 l/Maxwell Road desc/Met at coffee shop out/Agreed to cooperate`
+
+**Example (password-protected contact)**
+`log 1 d/2026-02-21 t/18:30 l/Maxwell Road desc/Met at coffee shop pw/oldSecret`
 
 **Validation**
 - DATE must be a valid calendar date
@@ -249,6 +257,8 @@ Records an interaction with a contact and appends it to the contact’s encounte
 - TIME must be valid 24-hour `HH:mm`
   Error: `Invalid time. Use 24-hour format HH:mm.`
 - DESCRIPTION cannot be blank; 1–500 characters
+- Repeating `d/`, `t/`, `l/`, `desc/`, `out/`, or `pw/` in the same command is not allowed.
+- If the contact is not password-protected, do not supply `pw/`.
 
 **Success output**
 `Encounter logged for [Name] on 2026-02-21 18:30.`
@@ -291,24 +301,27 @@ Updates an existing encounter for a contact.
 Adds a reminder entry to a contact.
 
 **Format**
-`remind INDEX d/DATE t/TIME note/NOTE`
+`remind INDEX d/DATE t/TIME note/NOTE [pw/PASSWORD]`
 
 **Parameters**
 - `INDEX` (compulsory): target contact in current list
 - `d/DATE` (compulsory): `YYYY-MM-DD`
 - `t/TIME` (compulsory): `HH:mm` (24-hour)
 - `note/NOTE` (compulsory): reminder text (not blank)
+- **`pw/PASSWORD`:** if the contact is password-protected, supply the **current** password (same as for `edit` and `view`).
 
 **Examples**
 - `remind 1 d/2026-03-28 t/20:00 note/Meet informant`
 - `remind 2 d/2026-04-01 t/09:15 note/Follow up on statement`
+- `remind 1 d/2026-03-28 t/20:00 note/Meet informant pw/oldSecret` (when the contact already has a password)
 
 **Validation**
 - INDEX must exist in the current contact list.
 - DATE must be valid and use `YYYY-MM-DD`.
 - TIME must be valid and use 24-hour `HH:mm`.
 - NOTE cannot be blank.
-- Repeating `d/`, `t/`, or `note/` in the same command is not allowed.
+- Repeating `d/`, `t/`, `note/`, or `pw/` in the same command is not allowed.
+- If the contact is not password-protected, do not supply `pw/`.
 
 **Success output**
 `Reminder set for [Name] on [DATE] [TIME].`
@@ -334,12 +347,19 @@ Displays the full profile of a contact and their encounter cards.
 - For protected contacts without/with wrong password: command fails with a password-related error.
 
 **Output (view panel)**
-- Name
-- Alias(es)
-- Stage
-- Risk
-- Notes
-- Encounter History (`#1` is the most recently logged encounter)
+
+The view panel displays the following fields in order:
+- **Name** — shown as a large heading at the top
+- **Stage** — displayed as a coloured badge (e.g. `surveillance`)
+- **Risk** — displayed as a coloured badge next to Stage (e.g. `MEDIUM RISK`)
+- **Phone**
+- **Email**
+- **Address**
+- **Aliases** — shows `None` if no aliases are set
+- **Notes** — shows `None` if no notes are set
+- **Tags** — each tag shown as a coloured badge; section omitted if no tags
+- **Upcoming Reminders** — shows `No reminders set.` if none exist
+- **Encounter History** — shows `No encounters logged.` if none exist; otherwise `#1` is the most recently logged encounter
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -388,11 +408,11 @@ Sorts the currently displayed contact list by a chosen criterion.
 
 **Behavior**
 - Sorting is applied to the displayed list view.
-- `sort location`: uses each contact's latest logged encounter location (the last encounter in that contact's history); contacts without encounters appear last.
+- `sort location`: uses the location from each contact's chronologically latest encounter (maximum encounter date-time); contacts without encounters appear last.
 - `sort tag`: uses each contact's alphabetically smallest tag; contacts without tags appear last.
 - `sort alphabetical`: sorts by contact name (A-Z).
 - `sort status`: sorts by stage/status alphabetically.
-- `sort recent`: sorts by latest logged encounter time first (the last encounter in each contact's history).
+- `sort recent`: sorts by each contact's chronologically latest encounter date-time first (most recent by date-time).
 - Ties are resolved by contact name in alphabetical order.
 
 --------------------------------------------------------------------------------------------------------------------
@@ -442,7 +462,7 @@ CrimeWatch data are saved in the hard disk automatically after any command that 
 
 ### Editing the data file
 
-CrimeWatch data are saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+CrimeWatch data are saved automatically as a JSON file `[JAR file location]/data/crimewatch.json`. Advanced users are welcome to update data directly by editing that data file.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
 If your changes to the data file make its format invalid, CrimeWatch will discard all data and start with an empty data file at the next run. Hence, it is recommended to back up the file before editing it.<br>
@@ -458,7 +478,7 @@ _Details coming soon ..._
 ## FAQ
 
 **Q: How do I transfer my data to another computer?**<br>
-**A**: Install the app on the other computer and overwrite the empty data file it creates with the `addressbook.json` file from your previous CrimeWatch home folder.
+**A**: Install the app on the other computer and overwrite the empty data file it creates with the `crimewatch.json` file from your previous CrimeWatch home folder.
 
 **Q: Can I edit suspect records after adding them?**<br>
 **A**: Yes, use the `edit` command to update any field—name, aliases, stage, risk level, or notes. Existing encounters are preserved.
@@ -481,8 +501,8 @@ _Details coming soon ..._
 **Q: My command is giving an error even though it looks correct. What should I check?**<br>
 **A**: 1) Ensure you're not repeating prefixes (e.g., `n/... n/...` is invalid). 2) Check date/time formats are exactly `YYYY-MM-DD` and `HH:mm`. 3) Verify the index exists in the current contact list. 4) If copying from a PDF, manually retype the command to avoid hidden space issues.
 
-**Q: What if `addressbook.json` is corrupted or cannot be read?**<br>
-**A**: CrimeWatch shows an error when the app opens. Only the `exit` command is accepted until you repair or replace the file; other commands are blocked and your data file is not overwritten. Use `exit`, fix `addressbook.json` (e.g. from a backup), then restart.
+**Q: What if `crimewatch.json` is corrupted or cannot be read?**<br>
+**A**: CrimeWatch shows an error when the app opens. Only the `exit` command is accepted until you repair or replace the file; other commands are blocked and your data file is not overwritten. Use `exit`, fix `crimewatch.json` (e.g. from a backup), then restart.
 
 --------------------------------------------------------------------------------------------------------------------
 
