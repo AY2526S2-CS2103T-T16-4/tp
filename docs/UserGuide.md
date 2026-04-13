@@ -388,11 +388,11 @@ Sorts the currently displayed contact list by a chosen criterion.
 
 **Behavior**
 - Sorting is applied to the displayed list view.
-- `sort location`: uses each contact's latest logged encounter location (the last encounter in that contact's history); contacts without encounters appear last.
+- `sort location`: uses the location from each contact's chronologically latest encounter (maximum encounter date-time); contacts without encounters appear last.
 - `sort tag`: uses each contact's alphabetically smallest tag; contacts without tags appear last.
 - `sort alphabetical`: sorts by contact name (A-Z).
 - `sort status`: sorts by stage/status alphabetically.
-- `sort recent`: sorts by latest logged encounter time first (the last encounter in each contact's history).
+- `sort recent`: sorts by each contact's chronologically latest encounter date-time first (most recent by date-time).
 - Ties are resolved by contact name in alphabetical order.
 
 --------------------------------------------------------------------------------------------------------------------
