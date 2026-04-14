@@ -363,6 +363,8 @@ Displays the full profile of a contact and their encounter cards.
 
 **Output (view panel)**
 
+<img width="1152" height="775" alt="image" src="https://github.com/user-attachments/assets/003e6e99-1610-4639-9135-0637d42ff807" />
+
 The view panel displays the following fields in order:
 - **Name** — shown as a large heading at the top
 - **Stage** — displayed as a coloured badge (e.g. `surveillance`)
