@@ -274,6 +274,8 @@ Records an interaction with a contact and appends it to the contact’s encounte
 **Success output**
 `Encounter logged for [Name] on 2026-02-21 18:30.`
 
+<img width="1064" height="341" alt="image" src="https://github.com/user-attachments/assets/93fe1b88-e7fe-420d-9f86-0137e0e086e2" />
+
 --------------------------------------------------------------------------------------------------------------------
 
 ### 5) Edit Encounter: `editencounter`
