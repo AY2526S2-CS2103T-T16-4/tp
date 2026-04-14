@@ -364,7 +364,7 @@ Key classes:
 
 ### Password Feature
 
-### Overview
+#### Overview
 Optional, contact-level password protection. Each contact can be protected with a password to restrict viewing its full details.
 In the current implementation, once a password is set for a contact, it cannot be changed or removed through commands.
 
@@ -871,9 +871,9 @@ This allows investigators to narrow down contacts more precisely (e.g. all high-
 
 ---
 
-**4. Add challenge for clearcommand**
+**4. Add challenge for clear**
 
-Currently, `clear` can be executed without confirmation, which may lead to accidental data loss. A future version will add a confirmation step that prompts the user to type a randomly generated challenge string E.g. ABC123 before proceeding with the clear operation. 
+Currently, `clear` can be executed without confirmation, which may lead to accidental data loss. A future version will add a confirmation step that prompts the user to type a randomly generated challenge string, e.g. `ABC123`, before proceeding with the clear operation. 
 
 This helps prevent unintended deletions while still allowing power users to execute the command efficiently when needed.
 
@@ -881,7 +881,7 @@ This helps prevent unintended deletions while still allowing power users to exec
 
 **5. Redact protected contacts in list views**
 
-Currently, password-protected contacts still show abbreviated details in list-based views (e.g. `list`, `find`, and sorted results). A future version will redact sensitive fields for protected contacts in these views until successful authentication via `view INDEX pw/PASSWORD`.
+Currently, password-protected contacts still show details in list-based views (e.g. `list`, `find`, and sorted results). A future version will redact sensitive fields for protected contacts in these views until successful authentication via `view INDEX pw/PASSWORD`.
 
 Proposed behavior:
 - Keep basic identity context visible (e.g. index and name) so users can still target commands.
