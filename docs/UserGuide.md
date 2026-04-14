@@ -30,7 +30,7 @@ This guide is intended for **undercover agents, detective investigators, and law
 - Entering typed commands in an application command box
 
 No programming experience is required.
-
+<div style="page-break-after: always;"></div>
 ### How to use this guide
 
 - If this is your first time using CrimeWatch, start at [Quick start](#quick-start).
@@ -90,15 +90,15 @@ CrimeWatch supports the following features: **Add**, **Edit**, and **Delete** co
    ![Ui](images/Ui-new.png)
 
 7. Try this 60-second typed-command tutorial:
-   - `help` to open this user guide.
-   - `list` to show all contacts.
-   - `add n/John Doe p/98765432 e/john@example.com a/Maxwell Road s/surveillance al/JD r/high note/Observed near station` to add a suspect profile.
-   - `view 1` to inspect the first contact.
-   - `log 1 d/2026-03-31 t/21:15 l/Maxwell Road desc/Short conversation out/Agreed to follow up` to log an encounter.
+   * `help` to open this user guide
+   * `list` to show all contacts
+   * `add n/John Doe p/98765432 e/john@example.com a/Maxwell Road s/surveillance al/JD r/high note/Observed near station` to add a suspect profile
+   * `view 1` to inspect the first contact
+   * `log 1 d/2026-03-31 t/21:15 l/Maxwell Road desc/Short conversation out/Agreed to follow up` to log an encounter
 
 8. Expected result after Step 7:
-   - You should see one newly added contact.
-   - You should see one newly added encounter for that contact.
+   * You should see one newly added contact
+   * You should see one newly added encounter for that contact
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Operational warning:**
 Do not store classified or highly sensitive intelligence in `note/` or `desc/` fields. Data is saved locally and contact passwords are plain text.
@@ -501,10 +501,6 @@ CrimeWatch data are saved automatically as a JSON file `[JAR file location]/data
 If your changes to the data file make its format invalid, CrimeWatch will discard all data and start with an empty data file at the next run. Hence, it is recommended to back up the file before editing it.<br>
 Furthermore, certain edits can cause CrimeWatch to behave in unexpected ways (e.g., if a value entered is outside acceptable ranges). Edit the data file only if you are confident that you can update it correctly.
 </div>
-
-### Archiving data files `[coming in v1.6]`
-
-_Details coming soon ..._
 
 --------------------------------------------------------------------------------------------------------------------
 
