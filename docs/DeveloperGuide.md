@@ -94,7 +94,7 @@ The diagram above treats concrete command types as `XYZCommand` to keep the high
 The following class diagram zooms into that placeholder and shows the concrete command hierarchy, together
 with key command-specific collaborators and multiplicities:
 
-<img src="images/CommandFeatureClassDiagram.png" width="900"/>
+<img src="images/CommandFeatureClassDiagram.png" width="1100"/>
 
 The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
 
@@ -237,7 +237,7 @@ Validation is enforced in model/value objects and parser utilities:
 - `Stage`: one of `surveillance`, `approached`, `cooperating`, `arrested`, `closed`.
 - `Notes`: optional text, max 500 chars, no newlines.
 - `Risk`: one of `low`, `medium`, `high` (case-insensitive parser).
-- `Password`: alphanumeric + spaces, non-blank when provided.
+- `Password`: alphanumeric, no spaces, non-blank when provided.
 - `Tag`: alphanumeric.
 
 Relevant classes:
@@ -384,6 +384,7 @@ edit 1 pw/              # Remove protection
 ```
 
 ### View protected contact
+
 view 1 pw/password123   # Show full details if password correct
 view 1                  # Error: password required
 
@@ -510,7 +511,17 @@ _{more aspects and alternatives to be added}_
 
 ### \[Proposed\] Data archiving
 
-_{Explain here how the data archiving feature will be implemented}_
+Data archiving allows officers to hide outdated contacts from daily operations without deleting historical records.
+
+The feature can be implemented by adding an `isArchived` boolean field to each `Person`.
+New commands can then toggle this state:
+* `archive INDEX` marks the selected contact as archived.
+* `unarchive INDEX` restores the selected archived contact.
+
+To keep current workflows simple, existing list/search commands should operate on non-archived contacts by default.
+An explicit command such as `list-archived` (or an archive filter flag) can be used to view archived records when needed.
+
+Archived contacts remain in the same local JSON file, preserving data portability and manual editability.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -800,3 +811,40 @@ Given below are manual tests for major functional paths and edge cases.
 3. Dealing with missing/corrupted data files
    1. Corrupt or remove the data file, then relaunch the app.
    1. Expected: the app handles the read failure gracefully and reports a clear error instead of crashing silently.
+
+--------------------------------------------------------------------------------------------------------------------
+
+## Appendix: Planned Enhancements
+
+This section documents known feature limitations that are intended to be addressed in a future version of CrimeWatch. These items have been identified but are out of scope for the current release.
+
+**Team size: 4**
+
+The maximum number of planned enhancements listed here is 8 (2 × team size).
+
+---
+
+**1. Add `deleteencounter` and `deletereminder` commands**
+
+Currently, there is no way to delete an individual encounter from a contact's encounter history or remove a reminder, short of deleting the entire contact. A future version will introduce:
+- `deleteencounter PERSON_INDEX enc/ENCOUNTER_INDEX` — removes a specific encounter from a contact's history
+- `deletereminder PERSON_INDEX rem/REMINDER_INDEX` — removes a specific reminder from a contact
+
+This will prevent encounter logs from accumulating erroneous or cancelled entries, improving data quality without requiring full contact deletion.
+
+---
+
+**2. Add `sort address` command**
+
+The current `sort location` command sorts contacts by the location of their most recent logged encounter, which may be unintuitive to users expecting it to sort by the contact's stored home/work address. A future version will add a distinct `sort address` command that sorts contacts alphabetically by their `a/ADDRESS` field, complementing `sort location`.
+
+---
+
+**3. Extend `find` to support `ADDRESS`, `STAGE`, and `RISK` filters**
+
+Currently, `find` only searches by name, alias, and tag. A future version will extend `find` to accept additional prefix filters:
+- `a/ADDRESS` — filter contacts whose address contains the given keyword
+- `s/STAGE` — filter contacts at a specific stage (e.g. `surveillance`, `cooperating`)
+- `r/RISK` — filter contacts by risk level (e.g. `high`, `medium`, `low`)
+
+This allows investigators to narrow down contacts more precisely (e.g. all high-risk contacts currently under surveillance).
